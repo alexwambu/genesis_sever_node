@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  genesis-server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: genesis-server
+    ports:
+      - "8000:8000"
+    networks:
+      - gbtnetwork
+
+  gbtnode1:
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    container_name: gbtnode1
+    environment:
+      - GENESIS_SERVER_URL=http://genesis-server:8000/genesis
+      - CHAIN_ID=999
+      - SIGNER=0x1a2b3c4d5e6f708192abcdef1234567890abcdef
+    ports:
+      - "9636:9636"
+      - "30303:30303"
+      - "30303:30303/udp"
+    depends_on:
+      - genesis-server
+    networks:
+      - gbtnetwork
+
+networks:
+  gbtnetwork:
+    driver: bridge
